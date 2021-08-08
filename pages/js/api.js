@@ -81,8 +81,8 @@ function dynamoItemsToTable(data, keyAttrs, keyName) {
 
     d.forEach((i) => {
         let obj = {
-            ...i,
-            keyName: formKey(keyAttrs, i)
+            key1: formKey(keyAttrs, i),
+            ...i
         }
         dd.push(obj)
         Object.keys(obj).forEach((k) => {

@@ -7,11 +7,14 @@ var SeeAll = {
       tableData: {},
       panelIndex: -1,
       gsiIndex: -1,
+      key1: '',
       tab: null,
       items: [
-        'Attributes', 'Global Indexes', 'Items',
+        'Attributes', 'Global Indexes', 'Items', 'Edit Item'
       ],
-      tableItems: {}
+      tableItems: {},
+      editors: {},
+      dialog: false
     }
   },
   methods: {
@@ -50,6 +53,20 @@ var SeeAll = {
       ///
     },
 
+    editorAsked: function (t) {
+      if (this.tableItems[t]['editor']) {
+        console.warn('Editor already created for Table', t)
+        return
+      }
+      var editor = ace.edit(t);
+      editor.resize()
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/json");
+      editor.setReadOnly(false)
+      this.tableItems[t]['editor'] = editor
+      console.info('Editor created for', t)
+    },
+
     itemsAsked: function (table) {
       scan(table)
         .then((data) => {
@@ -66,6 +83,14 @@ var SeeAll = {
 
           Vue.set(this.tableItems[table], 'items', dd)
           Vue.set(this.tableItems[table], 'headers', hh)
+
+          // Lets initialize editor
+          if (!this.editors[table]) {
+            // let editor = ace.edit(table);
+            // editor.setTheme("ace/theme/monokai");
+            // editor.session.setMode("ace/mode/javascript");
+            // this.editors[table] = editor
+          }
 
         }).catch((e) => {
           console.error('Error fetching data for table', e)
@@ -88,7 +113,12 @@ var SeeAll = {
       this.tables.forEach((t) => {
         Vue.set(this.tableData, t, {})
         Vue.set(this.tableItems, t, { 'items': [], 'headers': [], 'index': {} })
+
+
+
       })
+
+
     })
   },
   created: function () {
@@ -240,12 +270,27 @@ var SeeAll = {
           
         </v-tab-item>
 
+        <v-tab-item>
+          <v-btn icon color="green" v-on:click="editorAsked(n)">
+            <v-icon>mdi-cached</v-icon>
+          </v-btn>
+          <div style="position: relative; height: 550px; width: 100%;">
+              
+            <div v-bind:id="n" class="editor">
+            {'a': 10}
+          </div>      
+            </div>
+  
+        </v-tab-item>
+
       </v-tabs-items>
     
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
-    
+
+      
+
   </v-container>`
 }
 
