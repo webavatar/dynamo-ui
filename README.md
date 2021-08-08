@@ -20,8 +20,17 @@ Dynamo UI is a simple UI for managing DynamoDB local databases.
     node index.js
 5. The UI can be accessed by navigating to http://localhost:9001/pages/index.html
 
+## Online wihout installation !
 You may also use the online version of the application which is available here 
 https://apps1.behavinghuman.com/dui/index.html 
+
+## Upcoming
+1. Adding/Updating Items
+2. Queries
+
+### References
+https://github.com/aaronshaf/dynamodb-admin
+
 
 
 
