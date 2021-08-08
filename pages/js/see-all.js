@@ -63,6 +63,7 @@ var SeeAll = {
       editor.setTheme("ace/theme/monokai");
       editor.session.setMode("ace/mode/json");
       editor.setReadOnly(false)
+      editor.setFontSize(14)
       this.tableItems[t]['editor'] = editor
       console.info('Editor created for', t)
     },
