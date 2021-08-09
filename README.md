@@ -29,6 +29,12 @@ https://apps1.behavinghuman.com/dui/index.html
 1. Adding/Updating Items
 2. Queries
 
+### Who am I ? 
+I am a cloud enthusiast and like exploring new technologies ! AWS and Vue are a few of them :)
+
+### Why this tool ? 
+Well the other tools were too costly for the features :)
+
 ### References
 https://github.com/aaronshaf/dynamodb-admin
 
