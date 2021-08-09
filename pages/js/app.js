@@ -1,6 +1,6 @@
 var app = new Vue({
     el: '#app',
-    vuetify: new Vuetify(),
+    vuetify: new Vuetify({ theme: { dark: true }, }),
     components: {
         'see-all': SeeAll
     },
