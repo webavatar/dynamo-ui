@@ -10,7 +10,7 @@ var SeeAll = {
       key1: '',
       tab: null,
       items: [
-        'Attributes', 'Global Indexes', 'Items', 'Edit Item'
+        'Attributes', 'Global Indexes', 'Items'
       ],
       tableItems: {},
       editors: {},
@@ -33,8 +33,13 @@ var SeeAll = {
           let keyAttrs = []
 
           this.tableData[table]['GlobalSecondaryIndexes']
-            .filter(i => i.IndexName == index)
-            .map(i => i['KeySchema'])
+            .filter(i => {
+              return i.IndexName == index
+            })
+            .map(i => {
+              return i['KeySchema']
+            })
+            .flat()
             .forEach((i) => {
               keyAttrs.push(i.AttributeName)
             })
@@ -53,19 +58,55 @@ var SeeAll = {
       ///
     },
 
-    editorAsked: function (t) {
-      if (this.tableItems[t]['editor']) {
-        console.warn('Editor already created for Table', t)
+    rowSelected: function (table, item) {
+      console.log('Item selected', item)
+
+      delete item['key1']
+
+      if (this.tableItems[table]['editor']) {
+        console.warn('Editor already created for Table', table)
+
+        this.tableItems[table]['editor'].setValue(JSON.stringify(item, null, '\t'), -1)
+        this.tableItems[table]['visible'] = false
+
+        this.tableItems[table]['selected'] = item
         return
       }
-      var editor = ace.edit(t);
+      var editor = ace.edit(table);
       editor.resize()
       editor.setTheme("ace/theme/monokai");
       editor.session.setMode("ace/mode/json");
       editor.setReadOnly(false)
       editor.setFontSize(14)
-      this.tableItems[t]['editor'] = editor
-      console.info('Editor created for', t)
+      editor.setValue(JSON.stringify(item, null, '\t'), -1)
+      this.tableItems[table]['editor'] = editor
+      this.tableItems[table]['selected'] = item
+
+      editor.session.on('change', function (delta) {
+        console.log('Editor text changed...')
+        //this.tableItems[table]['selected'] = JSON.parse(editor.getValue())
+      });
+
+      console.info('Editor created for', table)
+
+      this.tableItems[table]['visible'] = false
+
+    },
+
+    // Saves last edited row
+    saveItem: function (table) {
+      if (!this.tableItems[table]['selected']) {
+        console.warn('No item selected for', table);
+        return
+      }
+      this.tableItems[table]['selected'] = JSON.parse(this.tableItems[table]['editor'].getValue())
+      saveTableItem(table, this.tableItems[table]['selected'])
+        .then((data) => {
+          console.info('Item saved successfully', data)
+        })
+        .catch((e) => {
+          console.error('Error saving item', e)
+        })
     },
 
     itemsAsked: function (table) {
@@ -84,14 +125,6 @@ var SeeAll = {
 
           Vue.set(this.tableItems[table], 'items', dd)
           Vue.set(this.tableItems[table], 'headers', hh)
-
-          // Lets initialize editor
-          if (!this.editors[table]) {
-            // let editor = ace.edit(table);
-            // editor.setTheme("ace/theme/monokai");
-            // editor.session.setMode("ace/mode/javascript");
-            // this.editors[table] = editor
-          }
 
         }).catch((e) => {
           console.error('Error fetching data for table', e)
@@ -113,13 +146,8 @@ var SeeAll = {
       this.tables = data.TableNames
       this.tables.forEach((t) => {
         Vue.set(this.tableData, t, {})
-        Vue.set(this.tableItems, t, { 'items': [], 'headers': [], 'index': {} })
-
-
-
+        Vue.set(this.tableItems, t, { 'items': [], 'headers': [], 'selected': {}, visible: true, 'index': {} })
       })
-
-
     })
   },
   created: function () {
@@ -164,7 +192,7 @@ var SeeAll = {
     }
   },
   template:
-    `<v-container class="grey lighten-5">
+    `<v-container >
 
     <v-expansion-panels focusable v-model="panelIndex">
     <v-expansion-panel v-for="n in tables" :key="n">
@@ -173,33 +201,17 @@ var SeeAll = {
       </v-expansion-panel-header>
       <v-expansion-panel-content>
 
-   
-      <v-toolbar
-        color="cyan"
-        dark
-        flat
-      >  
-        <template v-slot:extension>
-          <v-tabs
-            v-model="tab"
-            align-with-title
-          >
-            <v-tabs-slider color="yellow"></v-tabs-slider>
-  
-            <v-tab
-              v-for="item in items"
-              :key="item" v-on:click="clickedtab" 
-            >
-              {{ item }}
-            </v-tab>
-          </v-tabs>
-        </template>
-      </v-toolbar>
+      <v-tabs v-model="tab" align-with-title>
+        <v-tabs-slider color="yellow"></v-tabs-slider>
+
+        <v-tab v-for="item in items" :key="item" v-on:click="clickedtab">
+          {{ item }}
+        </v-tab>
+      </v-tabs>
   
       <v-tabs-items v-model="tab">
         <v-tab-item>
-
-        <v-container class="grey lighten-5">
+        <v-container >
         <v-row no-gutters>
           <v-col cols="1" sm="4">
             <v-card class="mx-auto" max-width="300" tile>
@@ -236,7 +248,7 @@ var SeeAll = {
                 {{ai.IndexName}}
               </v-expansion-panel-header>
               <v-expansion-panel-content>
-                <v-btn icon color="green" v-on:click="gsiClicked(n, ai.IndexName)">
+                <v-btn icon color="green" v-on:click="gsiClicked(n, ai.IndexName)" title="Load Index">
                   <v-icon>mdi-cached</v-icon>
                 </v-btn>
                 <template>
@@ -254,7 +266,7 @@ var SeeAll = {
         </v-tab-item>
 
         <v-tab-item>
-          <v-btn icon color="green" v-on:click="itemsAsked(n)">
+          <v-btn icon color="green" v-on:click="itemsAsked(n)" title="Load Items" v-show="tableItems[n]['visible']">
             <v-icon>mdi-cached</v-icon>
           </v-btn>
           <template>
@@ -262,26 +274,40 @@ var SeeAll = {
               :headers="tableItems[n]['headers']"
               :items="tableItems[n]['items']"
               :items-per-page="25"
-              :item-key="key1"
+              :item-key="key1" v-show="tableItems[n]['visible']"
               class="elevation-1">
+              <template v-slot:item.key1="{item}">
+                
+                <v-btn
+                  tile
+                  color="success" v-on:click="rowSelected(n,item)"
+                >
+                  <v-icon left>
+                    mdi-pencil
+                  </v-icon>
+                </v-btn>
+              </template>
             </v-data-table>
           </template> 
+
+          <v-card tile v-show="!tableItems[n]['visible']">
+              <v-btn tile color="success" v-on:click="saveItem(n)">
+                  Save Item
+                </v-btn>
+              <v-btn tile color="success" v-on:click="tableItems[n]['visible'] = true">
+                  Cancel Editing
+                </v-btn>
+              <div style="position: relative; height: 550px; width: 100%;">
+              
+                <div v-bind:id="n" class="editor">
+                  {'a': 10}
+                </div>      
+              </div>
+    
+          </v-card>
           
           Total {{tableData[n]['ItemCount']}} items occupying ({{tableData[n]['TableSizeBytes']}} bytes) 
           
-        </v-tab-item>
-
-        <v-tab-item>
-          <v-btn icon color="green" v-on:click="editorAsked(n)">
-            <v-icon>mdi-cached</v-icon>
-          </v-btn>
-          <div style="position: relative; height: 550px; width: 100%;">
-              
-            <div v-bind:id="n" class="editor">
-            {'a': 10}
-          </div>      
-            </div>
-  
         </v-tab-item>
 
       </v-tabs-items>
