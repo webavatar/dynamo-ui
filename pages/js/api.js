@@ -46,6 +46,14 @@ function fetchTableDetails(table) {
     return dynamodb.describeTable(params).promise()
 }
 
+function saveTableItem(table, item) {
+    var params = {
+        Item: AWS.DynamoDB.Converter.marshall(item),
+        TableName: table
+    };
+    return dynamodb.putItem(params).promise()
+}
+
 function fetchDynamoTables() {
 
     listTables('bssnew')
@@ -65,6 +73,8 @@ function fetchDynamoTables() {
  * @returns 
  */
 function dynamoItemsToTable(data, keyAttrs, keyName) {
+
+    console.debug('Mapping Items to Table', keyAttrs)
 
     let d = deserializerItems(data)
 
@@ -88,7 +98,11 @@ function dynamoItemsToTable(data, keyAttrs, keyName) {
         Object.keys(obj).forEach((k) => {
             kk.add(k)
         })
+    })
 
+    hh.push({
+        text: 'Key',
+        value: "key1"
     })
 
     keyAttrs.forEach((a) => {
@@ -99,7 +113,7 @@ function dynamoItemsToTable(data, keyAttrs, keyName) {
     })
 
     kk.forEach((k) => {
-        if (!keyAttrs.includes(k)) {
+        if (!keyAttrs.includes(k) && k != "key1") {
             hh.push({
                 text: k,
                 value: k
