@@ -30,22 +30,31 @@
     .v-expansion-panel-content__wrap{
         padding: 0px
     }
+    .container{
+        padding: 0px
+    }
 </style>
 </head>
 
 <body>
-
+    
     <div id="app">
        <v-app>
             <v-content>
-                <v-container>
-                    <h3>Dynamo UI</h3>
+                <v-container dark>
+                    <template>
+                        <div>
+                          <v-app-bar color="deep-purple accent-4" dense dark>
+                            <v-app-bar-nav-icon></v-app-bar-nav-icon>                      
+                            <v-toolbar-title>Dynamo UI</v-toolbar-title>                      
+                            <v-spacer></v-spacer>                      
+                          </v-app-bar>
+                        </div>
+                      </template>
                     <see-all ></see-all>                    
                 </v-container>
             </v-content>
-        </v-app>
-
-       
+        </v-app>     
     </div>
 
 
