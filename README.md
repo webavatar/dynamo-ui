@@ -2,7 +2,7 @@
 
 Current Version: 1.0.0
 
-Introduction
+## Introduction
 Dynamo UI is a simple UI for managing DynamoDB local databases. 
 
 ## Features
