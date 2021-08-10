@@ -14,7 +14,11 @@ var SeeAll = {
       ],
       tableItems: {},
       editors: {},
-      dialog: false
+      dialog: false,
+      errorMessage: '',
+      successMessage: '',
+      successMessageShow: false,
+      errorMessageShow: false
     }
   },
   methods: {
@@ -59,6 +63,8 @@ var SeeAll = {
     },
 
     rowSelected: function (table, item) {
+      this.successMessage = ''
+      this.errorMessage = ''
       console.log('Item selected', item)
 
       delete item['key1']
@@ -103,9 +109,17 @@ var SeeAll = {
       saveTableItem(table, this.tableItems[table]['selected'])
         .then((data) => {
           console.info('Item saved successfully', data)
+          this.successMessageShow = true
+          this.errorMessageShow = false
+          this.successMessage = 'success'
+          this.errorMessage = ''
         })
         .catch((e) => {
           console.error('Error saving item', e)
+          this.successMessage = ''
+          this.errorMessage = e.message
+          this.errorMessageShow = true
+          this.successMessageShow = false
         })
     },
 
@@ -269,6 +283,16 @@ var SeeAll = {
           <v-btn icon color="green" v-on:click="itemsAsked(n)" title="Load Items" v-show="tableItems[n]['visible']">
             <v-icon>mdi-cached</v-icon>
           </v-btn>
+
+          <v-alert type="success" dismissible  v-model="successMessageShow">
+              Updated Successfully !
+          </v-alert>
+
+          <v-alert type="error" dismissible v-model="errorMessageShow">
+            Failed to update -{{errorMessage}}
+          </v-alert>
+
+
           <template>
             <v-data-table 
               :headers="tableItems[n]['headers']"
