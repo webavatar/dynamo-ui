@@ -34,7 +34,7 @@ class Server {
         })
 
         app.get("/", (req, res) => {
-            res.send('Hello RETAG');
+            res.send('Hello Behaving Human');
         })
 
         app.get("/pages/*", (req, res) => {
