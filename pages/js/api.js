@@ -1,10 +1,10 @@
-var dynamodb = new AWS.DynamoDB({
-    accessKeyId: "fake",
-    secretAccessKey: "fake",
-    sessionToken: "fake",
-    endpoint: "http://localhost:8000",
-    region: 'ap-south-1'
-});
+var dynamodb = undefined
+
+
+function init(config) {
+    dynamodb = new AWS.DynamoDB(config);
+}
+
 
 function deserializer(item) {
     return AWS.DynamoDB.Converter.unmarshall(item)
@@ -52,6 +52,14 @@ function saveTableItem(table, item) {
         TableName: table
     };
     return dynamodb.putItem(params).promise()
+}
+
+function deleteTableItem(table, key) {
+    var params = {
+        Key: AWS.DynamoDB.Converter.marshall(key),
+        TableName: table
+    };
+    return dynamodb.deleteItem(params).promise()
 }
 
 function fetchDynamoTables() {
