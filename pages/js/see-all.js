@@ -100,12 +100,45 @@ var SeeAll = {
     },
 
     // Saves last edited row
+    removeItem: function (table, item) {
+
+      let key = {}
+
+      this.tableData[table]['KeySchema'].forEach((i) => {
+
+        Object.keys(item).forEach((k) => {
+          if (i.AttributeName == k) {
+            key[k] = item[k]
+          }
+        })
+      })
+
+      console.log('Deleting Item', key)
+      deleteTableItem(table, key)
+        .then((data) => {
+          console.info('Item deleted successfully', data)
+          this.successMessageShow = true
+          this.errorMessageShow = false
+          this.successMessage = 'success'
+          this.errorMessage = ''
+        })
+        .catch((e) => {
+          console.error('Error deleting item', e)
+          this.successMessage = ''
+          this.errorMessage = e.message
+          this.errorMessageShow = true
+          this.successMessageShow = false
+        })
+    },
+
+    // Saves last edited row
     saveItem: function (table) {
       if (!this.tableItems[table]['selected']) {
         console.warn('No item selected for', table);
         return
       }
       this.tableItems[table]['selected'] = JSON.parse(this.tableItems[table]['editor'].getValue())
+      console.log('New Item', this.tableItems[table]['selected'])
       saveTableItem(table, this.tableItems[table]['selected'])
         .then((data) => {
           console.info('Item saved successfully', data)
@@ -147,6 +180,60 @@ var SeeAll = {
 
     },
 
+    addNewAsked: function (table) {
+      this.successMessage = ''
+      this.errorMessage = ''
+
+      let item = {
+      }
+
+      // Populate the key fields
+      this.tableData[table]['KeySchema'].forEach((i) => {
+
+        this.tableData[table]['AttributeDefinitions'].forEach((a) => {
+
+          if (a['AttributeName'] == i['AttributeName']) {
+            if (a['AttributeType'] == "N") {
+              item[i.AttributeName] = 0
+            } else if (a['AttributeType'] == "S") {
+              item[i.AttributeName] = ""
+            }
+          }
+        })
+      })
+
+
+
+      if (this.tableItems[table]['editor']) {
+        console.warn('Editor already created for Table', table)
+
+        this.tableItems[table]['editor'].setValue(JSON.stringify(item, null, '\t'), -1)
+        this.tableItems[table]['visible'] = false
+
+        this.tableItems[table]['selected'] = item
+        return
+      }
+      var editor = ace.edit(table);
+      editor.resize()
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/json");
+      editor.setReadOnly(false)
+      editor.setFontSize(14)
+      editor.setValue(JSON.stringify(item, null, '\t'), -1)
+      this.tableItems[table]['editor'] = editor
+      this.tableItems[table]['selected'] = item
+
+      editor.session.on('change', function (delta) {
+        console.log('Editor text changed...')
+        //this.tableItems[table]['selected'] = JSON.parse(editor.getValue())
+      });
+
+      console.info('Editor created for', table)
+
+      this.tableItems[table]['visible'] = false
+
+    },
+
     clickedtab: function (ce) {
       console.log('Clicked', ce)
     }
@@ -154,6 +241,15 @@ var SeeAll = {
   mounted: function () {
     console.log('Mounted')
     this.root = this.$el;
+
+    init({
+      accessKeyId: "fake",
+      secretAccessKey: "fake",
+      sessionToken: "fake",
+      endpoint: "http://localhost:8000",
+      region: 'ap-south-1'
+    });
+
     this.tablePromise = listTables()
     this.tablePromise.then((data) => {
       console.log('Tables obtained', data)
@@ -207,6 +303,8 @@ var SeeAll = {
   },
   template:
     `<v-container >
+
+      <h2 v-if="!tables || tables.length == 0">No Tables found</h2>
 
     <v-expansion-panels focusable v-model="panelIndex">
     <v-expansion-panel v-for="n in tables" :key="n">
@@ -284,6 +382,10 @@ var SeeAll = {
             <v-icon>mdi-cached</v-icon>
           </v-btn>
 
+          <v-btn color="green" v-on:click="addNewAsked(n)" title="Add a new item" v-show="tableItems[n]['visible']">
+            Add New
+          </v-btn>
+
           <v-alert type="success" dismissible  v-model="successMessageShow">
               Updated Successfully !
           </v-alert>
@@ -301,25 +403,43 @@ var SeeAll = {
               :item-key="key1" v-show="tableItems[n]['visible']"
               class="elevation-1">
               <template v-slot:item.key1="{item}">
-                
-                <v-btn
-                  tile
-                  color="success" v-on:click="rowSelected(n,item)"
-                >
-                  <v-icon left>
-                    mdi-pencil
-                  </v-icon>
-                </v-btn>
+
+
+                <v-container>
+                    <v-row>
+                      <v-col cols="2" sm="2">
+
+                      <v-btn
+                         small title="edit"
+                        color="success" v-on:click="rowSelected(n,item)"
+                      >
+                        <v-icon left>
+                          mdi-pencil
+                        </v-icon>
+                      </v-btn>
+
+                      <v-btn
+                         small title="delete"
+                        color="warning" v-on:click="removeItem(n,item)">
+                        <v-icon left>
+                          mdi-delete
+                        </v-icon>
+                      </v-btn>
+                     
+                    </v-col>
+        
+                  </v-row>
+                </v-container>
               </template>
             </v-data-table>
           </template> 
 
           <v-card tile v-show="!tableItems[n]['visible']">
               <v-btn tile color="success" v-on:click="saveItem(n)">
-                  Save Item
+                  Save
                 </v-btn>
               <v-btn tile color="success" v-on:click="tableItems[n]['visible'] = true">
-                  Cancel Editing
+                  Cancel
                 </v-btn>
               <div style="position: relative; height: 550px; width: 100%;">
               
