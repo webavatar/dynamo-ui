@@ -8,11 +8,24 @@
 
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
+
+    <meta name="keywords" content="aws, dynamodb, dynamoui, dynamodb local"/>
+	<meta name="description" content="DynamoUI is a UI to help you access your AWS dynamoDB Local"/>
+	
     
     <link href='css/material.css' rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="css/index.css">
     
-    <title>Dynamo UI</title>
+    <title>Dynamo UI - AWS DynamoDB Local UI</title>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-BVTD8R3GZ3"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-BVTD8R3GZ3');
+	</script>
 
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.684.0.min.js"></script>
 
@@ -33,6 +46,11 @@
     .container{
         padding: 0px
     }
+
+    #gitSource {
+        color: beige;
+        text-decoration: none;
+    }
 </style>
 </head>
 
@@ -46,7 +64,7 @@
                         <div>
                           <v-app-bar color="deep-purple accent-4" dense dark>
                             <v-app-bar-nav-icon></v-app-bar-nav-icon>                      
-                            <v-toolbar-title>Dynamo UI - localhost</v-toolbar-title>                      
+                            <v-toolbar-title><a id="gitSource" href="https://github.com/webavatar/dynamo-ui" title="Click me to navigate to the Git source https://github.com/webavatar/dynamo-ui"> Dynamo UI - localhost</a></v-toolbar-title>                      
                             <v-spacer></v-spacer>                      
                           </v-app-bar>
                         </div>

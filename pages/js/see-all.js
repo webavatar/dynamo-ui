@@ -10,7 +10,7 @@ var SeeAll = {
       key1: '',
       tab: null,
       items: [
-        'Attributes', 'Global Indexes', 'Items'
+        'Manage', 'Attributes', 'Global Indexes', 'Items'
       ],
       tableItems: {},
       editors: {},
@@ -18,7 +18,8 @@ var SeeAll = {
       errorMessage: '',
       successMessage: '',
       successMessageShow: false,
-      errorMessageShow: false
+      errorMessageShow: false,
+      confirmDeletion: false
     }
   },
   methods: {
@@ -99,8 +100,18 @@ var SeeAll = {
 
     },
 
+    confirmDeleteItem: function (table, item) {
+      this.tableItems[table]['selected'] = item
+      this.confirmDeletion = true
+    },
+
     // Saves last edited row
-    removeItem: function (table, item) {
+    removeItem: function () {
+
+
+      let table = this.tables[this.panelIndex]
+
+      let item = this.tableItems[table]['selected']
 
       let key = {}
 
@@ -121,6 +132,7 @@ var SeeAll = {
           this.errorMessageShow = false
           this.successMessage = 'success'
           this.errorMessage = ''
+          this.confirmDeletion = false
         })
         .catch((e) => {
           console.error('Error deleting item', e)
@@ -128,6 +140,7 @@ var SeeAll = {
           this.errorMessage = e.message
           this.errorMessageShow = true
           this.successMessageShow = false
+          this.confirmDeletion = false
         })
     },
 
@@ -322,6 +335,12 @@ var SeeAll = {
       </v-tabs>
   
       <v-tabs-items v-model="tab">
+
+      <v-tab-item>
+        <v-btn color="green" v-on:click="" disabled title="Remove" >
+          Remove table {{n}}
+        </v-btn>
+      </v-tab-item>
         <v-tab-item>
         <v-container >
         <v-row no-gutters>
@@ -420,7 +439,7 @@ var SeeAll = {
 
                       <v-btn
                          small title="delete"
-                        color="warning" v-on:click="removeItem(n,item)">
+                        color="warning" v-on:click="confirmDeleteItem(n,item)">
                         <v-icon left>
                           mdi-delete
                         </v-icon>
@@ -460,7 +479,28 @@ var SeeAll = {
     </v-expansion-panel>
   </v-expansion-panels>
 
-      
+  
+    <v-dialog
+        transition="dialog-top-transition"
+        v-model="confirmDeletion" v-if="confirmDeletion"
+        max-width="300" light>
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark>Confirmation</v-toolbar>
+              Are you sure to remove {{tableItems[tables[panelIndex]]['selected'].id}} from table {{tables[panelIndex]}}?
+             
+            <v-card-actions class="justify-end">
+              <v-btn
+                  @click="removeItem()"
+                >Yes</v-btn>
+              <v-btn
+                text
+                @click="confirmDeletion=false"
+              >Cancel</v-btn>
+            </v-card-actions>
+          </v-card>
+    </v-dialog>
 
   </v-container>`
 }
