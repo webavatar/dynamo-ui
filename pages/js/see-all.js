@@ -249,17 +249,28 @@ var SeeAll = {
 
     clickedtab: function (ce) {
       console.log('Clicked', ce)
+    },
+
+    readCookie() {
+      let name = 'endpoint'
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
     }
   },
   mounted: function () {
     console.log('Mounted')
     this.root = this.$el;
 
+    let ep = this.readCookie()
+
+    console.log('Endpoint has been configured as', ep)
+
     init({
       accessKeyId: "fake",
       secretAccessKey: "fake",
       sessionToken: "fake",
-      endpoint: "http://localhost:8000",
+      endpoint: ep ? ep : "http://localhost:8000",
       region: 'ap-south-1'
     });
 
