@@ -27,20 +27,10 @@ class Server {
     }
 
     init() {
-
-        app.all("/s/*", async (req, res, next) => {
-
-
-        })
-
-        app.get("/", (req, res) => {
-            res.send('Hello Behaving Human');
-        })
-
-        app.get("/pages/*", (req, res) => {
+        app.get("/*", (req, res) => {
             //console.info('Authorized user is ', res.locals.auser.email);
 
-            let p = req.url.replace("/pages/", "")
+            let p = req.url
             res.sendFile(p, {
                 root: "pages"
             });
@@ -62,7 +52,7 @@ class Server {
         app.listen(port, function (error) {
             if (error)
                 throw error
-            console.info("Server created Successfully on PORT " + port)
+            console.info("Dynamo UI Server created Successfully on PORT " + port)
         })
     }
 }
