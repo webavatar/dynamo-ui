@@ -23,7 +23,7 @@ Dynamo UI is a simple UI for managing DynamoDB local databases.
 
 ## Online without installation !
 You may also use the online version of the application which is available here 
-https://www.dynamoui.com/
+https://dynamoui.v0.fyi/
 
 ## Upcoming
 1. Adding/Updating Items
@@ -37,6 +37,7 @@ Well the other tools were too costly for the features :)
 
 ### References
 https://github.com/aaronshaf/dynamodb-admin
+
 
 
 
