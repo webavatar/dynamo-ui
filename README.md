@@ -33,7 +33,7 @@ You may also use the online version of the application which is available here
 I am a cloud enthusiast and like exploring new technologies ! AWS and Vue are a few of them :)
 
 ### Why this tool ? 
-Well the other tools were too costly for the features :)
+Honestly I could not find one easier to use! 
 
 ### References
 https://github.com/aaronshaf/dynamodb-admin
