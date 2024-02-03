@@ -36,7 +36,7 @@ I am a cloud enthusiast and like exploring new technologies ! AWS and Vue are a 
 Honestly I could not find one easier to use! 
 
 ### References
-https://github.com/aaronshaf/dynamodb-admin
+[AWS Dynamo DB](https://aws.amazon.com/pm/dynamodb)
 
 
 
