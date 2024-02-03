@@ -26,14 +26,13 @@ You may also use the online version of the application which is available here
 [DynamoUI](https://webavatar.github.io/dynamo-ui/pages/index.html)
 
 ## Upcoming
-1. Adding/Updating Items
-2. Queries
+1. Queries
 
 ### Who am I ? 
-I am a cloud enthusiast and like exploring new technologies ! AWS and Vue are a few of them :)
+I am a cloud enthusiast and like exploring new technologies - AWS, DynamoDB, React and Vue are a few of them!
 
 ### Why this tool ? 
-Honestly I could not find one easier to use! 
+I could not find the all the features I was looking for in another tool! 
 
 ### References
 [AWS Dynamo DB](https://aws.amazon.com/pm/dynamodb)
