@@ -15,11 +15,16 @@ Dynamo UI is a simple UI for managing DynamoDB local databases.
 
 ## Steps
 1. First step is to install dynamodb locally. Steps on setting up DynamoDB locally can be found here https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.DownloadingAndRunning.html
-2. Install node ( v12 or higher)
-3. Checkout this repo locally 
-4. Run the application locally running below command:
+2. Check that DynamoDB Loacl is running at http://localhost:8000/
+3. Install node ( v12 or higher)
+4. Checkout this repo locally 
+5. Run the application locally running below command:
     node index.js
-5. The UI can be accessed by navigating to http://localhost:9001/pages/index.html
+6. The UI can be accessed by navigating to http://localhost:9001/pages/index.html
+
+In case you do not have dynamodb local running at http://localhost:8000/ then you must use a local proxy to divert request to the other server running at any host/port, for example http://192.168.1.100:8010 etc
+
+You can check references for sample local proxy
 
 ## Online without installation !
 You may also use the online version of the application which is available here 
@@ -36,6 +41,7 @@ I could not find the all the features I was looking for in another tool!
 
 ### References
 [AWS Dynamo DB](https://aws.amazon.com/pm/dynamodb)
+[Local CORS Proxy](https://www.npmjs.com/package/local-cors-proxy)
 
 
 
